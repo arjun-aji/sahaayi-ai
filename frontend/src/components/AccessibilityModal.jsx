@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { IconSettings } from './Icons';
+import { useState, useEffect, useRef } from 'react';
+import { IconSettings, IconWhatsApp } from './Icons';
+import { getCaregiverPhone, setCaregiverPhone } from '../utils/whatsapp';
 
 export function AccessibilityModal({
   isOpen,
@@ -16,6 +17,18 @@ export function AccessibilityModal({
   onReset
 }) {
   const modalRef = useRef(null);
+  const [caregiverPhone, setPhoneState] = useState(getCaregiverPhone);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPhoneState(getCaregiverPhone());
+    }
+  }, [isOpen]);
+
+  const handlePhoneChange = (val) => {
+    setPhoneState(val);
+    setCaregiverPhone(val);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -144,6 +157,29 @@ export function AccessibilityModal({
               <span className="switch-thumb" />
               <span className="sr-only">{t.slowerSpeechLabel}</span>
             </button>
+          </div>
+
+          {/* Caregiver Son/Daughter WhatsApp Phone */}
+          <div className="setting-input-item">
+            <div className="toggle-text-col">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <IconWhatsApp className="w-5 h-5 text-emerald-600" width={20} height={20} />
+                <label htmlFor="caregiver-phone-input" className="toggle-label" style={{ margin: 0 }}>
+                  {t.caregiverPhoneLabel || 'മക്കളുടെ WhatsApp നമ്പർ (Son/Daughter Phone)'}
+                </label>
+              </div>
+              <p className="toggle-desc">
+                {t.caregiverPhoneDesc || 'ഓർമ്മപ്പെടുത്തലുകൾ അറിയിക്കാനുള്ള വാട്സാപ്പ് നമ്പർ.'}
+              </p>
+            </div>
+            <input
+              id="caregiver-phone-input"
+              type="tel"
+              className="caregiver-phone-input"
+              value={caregiverPhone}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              placeholder="+91 7356568307"
+            />
           </div>
         </div>
 

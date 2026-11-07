@@ -600,6 +600,52 @@ async def read_document_endpoint(file: UploadFile = File(...), language: Optiona
     }
 
 
+class WhatsAppReminderRequest(BaseModel):
+    phone: Optional[str] = "+91 7356568307"
+    title: str
+    time: str
+    lang: Optional[str] = "ml"
+
+
+@app.post("/api/whatsapp-reminder")
+def whatsapp_reminder_endpoint(payload: WhatsAppReminderRequest):
+    """
+    Prepares and logs WhatsApp alert for son/daughter/caregiver.
+    """
+    raw_phone = payload.phone or "+91 7356568307"
+    clean_digits = "".join(filter(str.isdigit, raw_phone))
+    if len(clean_digits) == 10:
+        clean_digits = "91" + clean_digits
+
+    if payload.lang == "ml":
+        msg = (
+            f"🔔 *സഹായി AI (Sahaayi) - ഓർമ്മപ്പെടുത്തൽ*\n"
+            f"---------------------------------------\n"
+            f"⏰ *സമയം:* {payload.time}\n"
+            f"💊 *കാര്യം:* {payload.title}\n\n"
+            f"അച്ഛൻ / അമ്മയുടെ ഓർമ്മപ്പെടുത്തൽ സമയമായിട്ടുണ്ട്.\n"
+            f"(Sahaayi AI Senior Alert for Family)"
+        )
+    else:
+        msg = (
+            f"🔔 *Sahaayi AI - Senior Reminder Alert*\n"
+            f"---------------------------------------\n"
+            f"⏰ *Time:* {payload.time}\n"
+            f"💊 *Task / Medicine:* {payload.title}\n\n"
+            f"Senior reminder alert sent via Sahaayi AI Companion."
+        )
+
+    wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(msg)}"
+    print(f"[WhatsApp Alert] Prepared reminder notification for {clean_digits}: {payload.title} at {payload.time}")
+
+    return {
+        "status": "success",
+        "phone": clean_digits,
+        "whatsapp_url": wa_url,
+        "message": msg
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     is_in_backend = os.path.basename(os.getcwd()) == "backend"

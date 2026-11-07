@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { IconClock, IconPill, IconSpeaker, IconStop, IconTrash, IconCheck, IconMic } from './Icons';
+import { IconClock, IconPill, IconSpeaker, IconStop, IconTrash, IconCheck, IconMic, IconWhatsApp } from './Icons';
 import { speakText, stopSpeech, isSpeechRecognitionSupported, createSpeechRecognizer } from '../utils/speech';
 import { parseReminderFromVoice, saveReminder } from '../utils/reminderParser';
+import { sendWhatsAppReminder, getCaregiverPhone } from '../utils/whatsapp';
 
 const DEFAULT_REMINDERS = [
   {
@@ -416,6 +417,19 @@ export function RemindersSection({ t, lang, slowerSpeech }) {
                 </div>
 
                 <div className="reminder-actions-col">
+                  <button
+                    type="button"
+                    className="item-whatsapp-btn"
+                    onClick={() => sendWhatsAppReminder(item, lang)}
+                    aria-label={`${lang === 'ml' ? 'മക്കൾക്ക് WhatsApp അയക്കുക' : 'Send WhatsApp to family'}: ${displayTitle}`}
+                    title={lang === 'ml' ? `മക്കൾക്ക് WhatsApp അയക്കുക (${getCaregiverPhone()})` : `Send WhatsApp to son/daughter (${getCaregiverPhone()})`}
+                  >
+                    <IconWhatsApp className="w-5 h-5" />
+                    <span className="btn-label-text">
+                      {lang === 'ml' ? 'അറിയിക്കുക' : 'WhatsApp'}
+                    </span>
+                  </button>
+
                   <button
                     type="button"
                     className={`item-speak-btn ${isSpeakingThis ? 'speaking-active' : ''}`}

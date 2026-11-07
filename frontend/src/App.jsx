@@ -13,10 +13,11 @@ import { RemindersSection } from './components/RemindersSection';
 import { AccessibilityModal } from './components/AccessibilityModal';
 import { FloatingVoiceAssistant } from './components/FloatingVoiceAssistant';
 import { SafetyBanner } from './components/SafetyBanner';
-import { IconClock, IconSpeaker, IconCheck, IconHome, IconChat, IconCalendarClock } from './components/Icons';
+import { IconClock, IconSpeaker, IconCheck, IconHome, IconChat, IconCalendarClock, IconWhatsApp } from './components/Icons';
 import { sendChatMessage } from './utils/api';
 import { speakText, stopSpeech } from './utils/speech';
 import { parseReminderFromVoice, saveReminder, normalizeTimeTo24h, playChimeSound } from './utils/reminderParser';
+import { sendWhatsAppReminder, getCaregiverPhone } from './utils/whatsapp';
 import './App.css';
 
 function App() {
@@ -559,6 +560,15 @@ function App() {
               {lang === 'ml' && activeAlarm.titleMl ? activeAlarm.titleMl : activeAlarm.title}
             </p>
             <div className="alert-alarm-actions">
+              <button
+                type="button"
+                className="alert-whatsapp-btn"
+                onClick={() => sendWhatsAppReminder(activeAlarm, lang)}
+                title={`WhatsApp: ${getCaregiverPhone()}`}
+              >
+                <IconWhatsApp className="w-5 h-5" />
+                <span>{lang === 'ml' ? 'മക്കൾക്ക് WhatsApp അയക്കാം' : 'WhatsApp Family'}</span>
+              </button>
               <button
                 type="button"
                 className="alert-repeat-btn"
