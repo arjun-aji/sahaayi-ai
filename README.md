@@ -27,22 +27,24 @@
 3. **Persistent Floating Voice Assistant**:
    - An accessible floating **`🎙️ ശബ്ദ കമാൻഡ്`** button is available in the bottom-right corner of every screen, allowing seniors to jump between sections or ask questions anytime without looking for back buttons.
 
-4. **Real-Time Active Reminder Alarms**:
+4. **Real-Time Active Reminder Alarms & WhatsApp Alerts**:
    - **3-Second Background Polling**: Continuously checks system time against reminders.
    - **Flexible Time Parsing**: Recognizes dot & colon formats (e.g. `1.27 pm`, `1:27 PM`, `13:27`, *"വൈകിട്ട് 4 മണിക്ക്"*).
    - **Musical Chime 🔔**: Plays a crystal-clear hospital-grade audio chime via Web Audio API.
    - **Live Spoken Alert**: Sahaayi announces: *"ശ്രദ്ധിക്കുക! ഇപ്പോൾ സമയം 13:27 ആയി. [Title] സമയമാണ്."*
-   - **High-Contrast Alert Popup**: Fullscreen popup with large text, *"Read Again"*, and *"Done / Dismiss"* buttons.
-   - **Desktop Push Notifications**: Alerts even when another browser tab is active.
+   - **High-Contrast Alert Popup**: Fullscreen popup with large text, *"Read Again"*, *"Done / Dismiss"*, and **1-tap WhatsApp alert**.
+   - **Caregiver WhatsApp Integration**: 1-tap **"മക്കൾക്ക് WhatsApp അയക്കാം"** button sends pre-composed reminder alerts directly to the son or daughter's WhatsApp (`+91 7356568307`).
 
 5. **Voice-Controlled Reminders**:
    - Speak e.g.: *"വൈകിട്ട് 4 മണിക്ക് ഗുളിക കഴിക്കാൻ ഓർമ്മിപ്പിക്കുക"* or *"Remind me to drink warm water at 11 AM"*.
    - Automatically calculates 24-hr time, categorizes (*medicine*, *doctor*, *daily*), saves to storage, and confirms by voice.
    - Dedicated **`🎙️ ശബ്ദം വഴി ചേർക്കുക` (Add by Voice)** button in the Reminders section.
+   - Direct WhatsApp share button on every reminder card in the list.
 
-6. **Medicine Strip & Bottle Reader**:
+6. **Medicine Strip & Bottle Reader + 1-Tap Purchase Request**:
    - Camera capture (`capture="environment"`) and image upload for medicine boxes and prescription strips.
-   - Multimodal **Gemini 3.8 Flash Vision** processing for identifying brand names, active strengths, and directions.
+   - Multimodal **Gemini 3.8 Flash Vision** processing for identifying brand names, active strengths, directions, and **clinical use of tablets in simple Malayalam**.
+   - **1-Tap WhatsApp Buy Request for Daughter**: Scanned medicine image preview, quantity stepper (1, 2, 3... strips/bottles/boxes), urgency notes (*"ഗുളിക തീരാറായി, ഉടൻ വാങ്ങിത്തരണം"*), and 1-tap WhatsApp send to daughter (`+91 7356568307`).
    - Medical safety disclaimers: always advises consulting certified physicians and never fabricates unverified dosages.
 
 7. **Document & Hospital Slip Reader**:
@@ -78,6 +80,26 @@ npm run dev
 ```
 
 Visit [`http://localhost:5173`](http://localhost:5173) in your browser.
+
+---
+
+## 🌐 Production Cloud Deployment
+
+### 1. Backend on Render
+- **Blueprint Setup**: Render automatically detects the root [`render.yaml`](render.yaml) file.
+- **Manual Setup**:
+  - **Root Directory**: `backend`
+  - **Runtime**: Python 3
+  - **Build Command**: `pip install -r requirements.txt`
+  - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+  - **Environment Variables**: Add `GEMINI_API_KEY`.
+
+### 2. Frontend on Vercel
+- **Root Directory**: `frontend`
+- **Framework Preset**: Vite
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Environment Variable**: `VITE_BACKEND_URL` = `https://<your-render-service>.onrender.com`
 
 ---
 
