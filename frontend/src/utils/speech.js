@@ -15,7 +15,7 @@ export const getAvailableVoices = () => {
 };
 
 // Global tracker for HTML5 audio playback (Malayalam TTS stream)
-const BACKEND_BASE_URL = 'http://127.0.0.1:8000';
+const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
 let currentAudio = null;
 let currentObjectUrl = null;
 
