@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { IconCamera, IconPill, IconShield, IconSpeaker, IconStop } from './Icons';
+import { IconCamera, IconPill, IconShield, IconSpeaker, IconStop, IconWhatsApp } from './Icons';
 import { speakText, stopSpeech } from '../utils/speech';
 import { uploadMedicineImage } from '../utils/api';
+import { sendWhatsAppMedicineOrder, getCaregiverPhone } from '../utils/whatsapp';
 
 export function MedicineReader({ t, lang, slowerSpeech }) {
   const [cameraError, setCameraError] = useState(null);
@@ -9,6 +10,12 @@ export function MedicineReader({ t, lang, slowerSpeech }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+
+  // Buy & Count WhatsApp Order state
+  const [orderCount, setOrderCount] = useState(1);
+  const [orderUnit, setOrderUnit] = useState(() => (lang === 'ml' ? 'സ്ട്രിപ്പ് (Strip)' : 'Strip'));
+  const [orderNote, setOrderNote] = useState(() => (lang === 'ml' ? 'ഗുളിക തീരാറായി, വാങ്ങിത്തരണം' : 'Running low, please buy'));
+  const [shareFeedback, setShareFeedback] = useState(null);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -170,6 +177,8 @@ export function MedicineReader({ t, lang, slowerSpeech }) {
     setCameraError(null);
     setCapturedImage(null);
     setAnalysisResult(null);
+    setOrderCount(1);
+    setShareFeedback(null);
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } },
@@ -182,6 +191,36 @@ export function MedicineReader({ t, lang, slowerSpeech }) {
         }
       }).catch(() => {});
     }
+  };
+
+  const handleShareWithPhoto = async () => {
+    if (navigator.share && capturedImage) {
+      try {
+        const res = await fetch(capturedImage);
+        const blob = await res.blob();
+        const file = new File([blob], 'medicine_photo.jpg', { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Sahaayi AI - Medicine Order',
+            text: `സഹായി AI മരുന്ന് വാങ്ങിത്തരാനുള്ള അപേക്ഷ:\n${orderCount} ${orderUnit} - ${orderNote}\n\n${analysisResult?.slice(0, 200)}...`,
+            files: [file]
+          });
+          setShareFeedback(lang === 'ml' ? 'ഫോട്ടോ പങ്കുവെച്ചു!' : 'Photo shared successfully!');
+          return;
+        }
+      } catch (err) {
+        // user cancelled or share failed, fallback
+        console.log('Native share error or dismissed:', err);
+      }
+    }
+    // Fallback: direct WhatsApp URL trigger
+    sendWhatsAppMedicineOrder({
+      medicineText: analysisResult,
+      count: orderCount,
+      unit: orderUnit,
+      note: orderNote,
+      lang
+    });
   };
 
   const handleToggleSpeak = () => {
@@ -358,6 +397,153 @@ export function MedicineReader({ t, lang, slowerSpeech }) {
                 ? 'പ്രധാനം: മരുന്നിന്റെ കൃത്യമായ അളവ് നിങ്ങളുടെ ഡോക്ടറുടെ നിർദ്ദേശപ്രകാരം മാത്രം കഴിക്കുക.'
                 : 'Important: Always confirm medication dosages with your certified doctor or pharmacist.'}
             </p>
+          </div>
+
+          {/* WhatsApp Buy & Count Request Integration for Daughter */}
+          <div className="medicine-buy-whatsapp-card">
+            <div className="buy-card-header">
+              <div className="buy-title-group">
+                <div className="whatsapp-badge-icon">
+                  <IconWhatsApp className="w-6 h-6 text-white" width={24} height={24} />
+                </div>
+                <div>
+                  <h4 className="buy-heading">
+                    {lang === 'ml' ? 'മരുന്ന് വാങ്ങിത്തരാൻ മകൾക്ക് WhatsApp അയക്കാം' : 'Ask Daughter to Buy Medicine'}
+                  </h4>
+                  <p className="buy-subheading">
+                    {lang === 'ml'
+                      ? `വാട്സാപ്പ് വഴി മകൾക്ക് (${getCaregiverPhone()}) സന്ദേശം അയക്കാം`
+                      : `Send WhatsApp message directly to daughter (${getCaregiverPhone()})`}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Scanned Image Preview Thumbnail & Count Controls */}
+            <div className="buy-order-config-row">
+              {capturedImage && (
+                <div className="buy-image-thumb-box">
+                  <img src={capturedImage} alt="Scanned medicine thumbnail" className="buy-image-thumb" />
+                  <span className="buy-image-label">{lang === 'ml' ? 'സ്കാൻ ചെയ്തത്' : 'Scanned'}</span>
+                </div>
+              )}
+
+              <div className="buy-controls-col">
+                {/* Quantity Stepper */}
+                <div className="buy-control-group">
+                  <span className="buy-field-label">
+                    {lang === 'ml' ? 'എണ്ണം / അളവ് (Quantity):' : 'Quantity / Count:'}
+                  </span>
+                  <div className="buy-stepper-wrap">
+                    <button
+                      type="button"
+                      className="stepper-btn stepper-minus"
+                      onClick={() => setOrderCount((c) => Math.max(1, c - 1))}
+                      aria-label="Decrease quantity"
+                    >
+                      −
+                    </button>
+                    <span className="stepper-value">{orderCount}</span>
+                    <button
+                      type="button"
+                      className="stepper-btn stepper-plus"
+                      onClick={() => setOrderCount((c) => c + 1)}
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Packaging Unit Selector */}
+                <div className="buy-unit-chips-row">
+                  {[
+                    { id: 'strip', ml: 'സ്ട്രിപ്പ് (Strip)', en: 'Strip' },
+                    { id: 'box', ml: 'ബോക്സ് (Box)', en: 'Box' },
+                    { id: 'bottle', ml: 'കുപ്പി (Bottle)', en: 'Bottle' }
+                  ].map((unitItem) => {
+                    const unitLabel = lang === 'ml' ? unitItem.ml : unitItem.en;
+                    const isSelected = orderUnit === unitLabel;
+                    return (
+                      <button
+                        key={unitItem.id}
+                        type="button"
+                        className={`buy-unit-chip ${isSelected ? 'chip-active' : ''}`}
+                        onClick={() => setOrderUnit(unitLabel)}
+                      >
+                        {unitLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Note / Urgency Selector */}
+            <div className="buy-note-section">
+              <span className="buy-field-label">
+                {lang === 'ml' ? 'കുറിപ്പ് (Note for Daughter):' : 'Note for Daughter:'}
+              </span>
+              <div className="buy-preset-notes-row">
+                {[
+                  { ml: 'ഗുളിക തീരാറായി, വാങ്ങിത്തരണം', en: 'Running out soon, please buy' },
+                  { ml: 'ഉടൻ വേണം (അത്യാവശ്യം)', en: 'Urgent, needed today' },
+                  { ml: 'അടുത്ത മാസത്തേക്ക്', en: 'For next month' }
+                ].map((preset) => {
+                  const text = lang === 'ml' ? preset.ml : preset.en;
+                  const isSelected = orderNote === text;
+                  return (
+                    <button
+                      key={preset.en}
+                      type="button"
+                      className={`buy-note-chip ${isSelected ? 'chip-active' : ''}`}
+                      onClick={() => setOrderNote(text)}
+                    >
+                      {text}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Action Buttons: WhatsApp Send & Native Photo Share */}
+            <div className="buy-actions-footer">
+              <button
+                type="button"
+                className="buy-whatsapp-send-btn"
+                onClick={() =>
+                  sendWhatsAppMedicineOrder({
+                    medicineText: analysisResult,
+                    count: orderCount,
+                    unit: orderUnit,
+                    note: orderNote,
+                    lang
+                  })
+                }
+              >
+                <IconWhatsApp className="w-6 h-6 text-white" width={24} height={24} />
+                <span>
+                  {lang === 'ml'
+                    ? `മകൾക്ക് വാട്സാപ്പിൽ അയക്കുക (${orderCount} ${orderUnit})`
+                    : `Send to Daughter via WhatsApp (${orderCount} ${orderUnit})`}
+                </span>
+              </button>
+
+              {typeof navigator !== 'undefined' && navigator.share && (
+                <button
+                  type="button"
+                  className="buy-share-photo-btn"
+                  onClick={handleShareWithPhoto}
+                  title="Share image via phone"
+                >
+                  <span>📷 {lang === 'ml' ? 'ഫോട്ടോയും കൂടെ അയക്കുക' : 'Share with Photo'}</span>
+                </button>
+              )}
+            </div>
+
+            {shareFeedback && (
+              <p className="buy-feedback-text">{shareFeedback}</p>
+            )}
           </div>
         </div>
       )}
