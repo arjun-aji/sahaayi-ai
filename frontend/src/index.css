@@ -1,0 +1,157 @@
+/* Sahaayi AI — Global Theme & Accessibility Tokens */
+:root {
+  --font-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Malayalam', Helvetica, Arial, sans-serif;
+  
+  /* Primary Color Palette from Reference */
+  --color-forest-green: #064F38;
+  --color-deep-green: #0B5B40;
+  --color-sidebar-active: #246549;
+  --color-lime-green: #B8ED65;
+  --color-lime-green-hover: #a8df53;
+  --color-warm-ivory: #FFF9EF;
+  --color-warm-ivory-darker: #F7EFE2;
+  
+  /* Feature Card Colors from Reference */
+  --color-card-medicine-bg: #EDF7E9;
+  --color-card-medicine-border: #D2EAC9;
+  --color-card-medicine-icon: #2E8B57;
+
+  --color-card-docs-bg: #FFF4E1;
+  --color-card-docs-border: #F8DEC0;
+  --color-card-docs-icon: #D97706;
+
+  --color-card-chat-bg: #E8F3FC;
+  --color-card-chat-border: #CCE5F8;
+  --color-card-chat-icon: #0284C7;
+
+  --color-card-reminders-bg: #F5EAFE;
+  --color-card-reminders-border: #E6CEFA;
+  --color-card-reminders-icon: #7C3AED;
+
+  /* Text & Elements */
+  --color-text-dark: #083727;
+  --color-text-body: #174233;
+  --color-text-muted: #4B6358;
+  --color-border-subtle: #E2D9CC;
+  
+  /* Typography Scale */
+  --font-size-base: 17px;
+  --font-size-hero-title: 38px;
+  --font-size-hero-sub: 22px;
+  --font-size-card-title: 20px;
+  --font-size-card-desc: 14.5px;
+  --font-size-chip: 14px;
+
+  --focus-ring: 3px solid #064F38;
+  --radius-card: 20px;
+  --radius-pill: 9999px;
+  --radius-sm: 10px;
+}
+
+/* Accessible Font Sizes */
+.large-text-mode {
+  --font-size-base: 20px;
+  --font-size-hero-title: 44px;
+  --font-size-hero-sub: 26px;
+  --font-size-card-title: 23px;
+  --font-size-card-desc: 17px;
+  --font-size-chip: 16px;
+}
+
+.extra-large-text-mode {
+  --font-size-base: 23px;
+  --font-size-hero-title: 50px;
+  --font-size-hero-sub: 30px;
+  --font-size-card-title: 26px;
+  --font-size-card-desc: 19px;
+  --font-size-chip: 18px;
+}
+
+/* High Contrast Mode */
+.high-contrast-mode {
+  --color-warm-ivory: #ffffff;
+  --color-forest-green: #000000;
+  --color-deep-green: #000000;
+  --color-sidebar-active: #222222;
+  --color-text-dark: #000000;
+  --color-text-body: #000000;
+  --color-text-muted: #111111;
+  --color-lime-green: #90d832;
+  --color-border-subtle: #000000;
+  --color-card-medicine-border: #000000;
+  --color-card-docs-border: #000000;
+  --color-card-chat-border: #000000;
+  --color-card-reminders-border: #000000;
+  --focus-ring: 4px solid #000000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Accessible SVG icon sizing utilities */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.w-4, .h-4 { width: 16px !important; height: 16px !important; }
+.w-5, .h-5 { width: 20px !important; height: 20px !important; }
+.w-6, .h-6 { width: 24px !important; height: 24px !important; }
+.w-7, .h-7 { width: 28px !important; height: 28px !important; }
+.w-8, .h-8 { width: 32px !important; height: 32px !important; }
+.flex-shrink-0 { flex-shrink: 0 !important; }
+
+html, body {
+  font-family: var(--font-base);
+  font-size: var(--font-size-base);
+  color: var(--color-text-dark);
+  background-color: var(--color-warm-ivory);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Screen reader skip link */
+.sr-skip-link {
+  position: absolute;
+  top: -80px;
+  left: 20px;
+  background: var(--color-forest-green);
+  color: #ffffff;
+  padding: 12px 20px;
+  z-index: 9999;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.sr-skip-link:focus {
+  top: 20px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
