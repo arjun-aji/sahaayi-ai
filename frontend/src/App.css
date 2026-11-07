@@ -87,7 +87,7 @@
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar (Fixed & Sticky on Desktop) */
 .app-sidebar {
   width: 255px;
   background-color: var(--color-forest-green);
@@ -95,11 +95,27 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 28px 18px;
   border-top-right-radius: 28px;
   border-bottom-right-radius: 28px;
+  z-index: 100;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.app-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.app-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 .sidebar-header {
@@ -174,16 +190,27 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px 36px 28px 36px;
+  padding: 0 36px 28px 36px;
   overflow-x: hidden;
+  min-width: 0;
 }
 
-/* Top Header */
+/* Top Header (Sticky on Desktop) */
 .desktop-top-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-warm-ivory);
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 16px 0 16px 0;
+  margin-bottom: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.high-contrast-mode .desktop-top-header {
+  background-color: #000000;
 }
 
 .top-header-actions {
