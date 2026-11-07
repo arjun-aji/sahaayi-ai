@@ -597,7 +597,7 @@ export function MobileView({
           className={`bottom-nav-item ${activeTab === 'home' ? 'nav-active' : ''}`}
           onClick={() => onSelectTab('home')}
         >
-          <IconHome className="w-5 h-5" width={20} height={20} />
+          <IconHome width={22} height={22} />
           <span className="nav-label">{lang === 'ml' ? 'ഹോം' : 'Home'}</span>
         </button>
 
@@ -606,7 +606,7 @@ export function MobileView({
           className={`bottom-nav-item ${activeTab === 'chat' ? 'nav-active' : ''}`}
           onClick={() => onSelectTab('chat')}
         >
-          <IconChat className="w-5 h-5" width={20} height={20} />
+          <IconChat width={22} height={22} />
           <span className="nav-label">{lang === 'ml' ? 'ചോദിക്കുക' : 'Ask'}</span>
         </button>
 
@@ -615,7 +615,7 @@ export function MobileView({
           className={`bottom-nav-item ${activeTab === 'reminders' ? 'nav-active' : ''}`}
           onClick={() => onSelectTab('reminders')}
         >
-          <IconCalendarClock className="w-5 h-5" width={20} height={20} />
+          <IconCalendarClock width={22} height={22} />
           <span className="nav-label">{lang === 'ml' ? 'ഓർമ്മപ്പെടുത്തലുകൾ' : 'Reminders'}</span>
         </button>
       </nav>
